@@ -23,14 +23,20 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
           push: false
           tags: my-docker-image:${{ github.sha }}
 
-      - name: Save Docker image to repository
-        uses: actions/upload-artifact@v2
+      - name: Create and save image info to a file
+        run: echo "Image built: ghcr.io/${{ github.repository }}/my-docker-image:${{ github.sha }}" > docker_image.txt
+
+      - name: Commit and push the changes
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: my-docker-image
-          path: .docker/manifests/${{ github.sha }}
+          commit_message: "Update Docker image info"
+          branch: ${{ github.ref }}
+          files: |
+            docker_image.txt
