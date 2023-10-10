@@ -1,47 +1,26 @@
-name: Docker Build and Publish
+name: Docker image to docker hub
 
-on:
+on: 
   push:
     branches:
-      - main
-
+      - 'main'
 jobs:
-  build-and-publish:
+  push_to_docker_hub:
+    name: Push image to Docker hub
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
+      - name: checkout out the repo 
+        uses: actions/checkout@v4
+      
+      - name: log in to docker hub 
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Configure Git
-        run: |
-          git config --global user.email "367425@edu.itmo.ru"
-          git config --global user.name "Vikttrr"
-          echo "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}" > remote_url.txt
-          git remote set-url origin "$(cat remote_url.txt)"
-
-      - name: Build Docker image
-        id: docker_build
-        uses: docker/build-push-action@v2
+      - name: build image and push
+        uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
-          tags: my-docker-image:${{ github.sha }}
-
-      - name: Extract image information
-        run: echo "ghcr.io/${{ github.repository }}/my-custom-image:latest" > docker_image.txt
-
-      - name: Commit and push the changes
-        run: |
-          git add docker_image.txt
-          git commit -m "Update Docker image info"
-          git push origin HEAD:${{ github.ref }}
+          push: true
+          tags: vikttrr/lab3:latest
