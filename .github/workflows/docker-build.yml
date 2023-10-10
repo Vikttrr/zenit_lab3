@@ -23,4 +23,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: vikttrr/lab3:latest
+          tags: vikttrr/lab3_new:latest
