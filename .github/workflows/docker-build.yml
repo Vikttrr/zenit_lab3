@@ -22,6 +22,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Create remote URL file
+        run: echo "https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}" > remote_url.txt
+
       - name: Configure Git
         run: |
           git config --global user.email "actions@github.com"
