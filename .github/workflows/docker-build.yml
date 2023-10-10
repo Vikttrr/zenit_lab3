@@ -23,10 +23,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Configure Git
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git remote add origin_with_auth https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git
+        run: git config --global credential.helper store && echo "https://${{ secrets.GH_PAT }}@github.com" > remote_url.txt
 
       - name: Build Docker image
         id: docker_build
@@ -41,6 +38,7 @@ jobs:
 
       - name: Commit and push the changes
         run: |
+          git remote set-url origin "$(cat remote_url.txt)"
           git add docker_image.txt
           git commit -m "Update Docker image info"
-          git push origin_with_auth HEAD:${{ github.ref }}
+          git push origin HEAD:${{ github.ref }}
